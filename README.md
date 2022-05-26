@@ -1,3 +1,3 @@
-# sydr-security-slides
+# MSU slides
 
-Slides for security predicates in Sydr.
+Slides for MSU thesis.
