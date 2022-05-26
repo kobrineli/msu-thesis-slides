@@ -55,7 +55,7 @@
 \title{Поиск ошибок целочисленного переполнения методами динамической символьной
 интерпретации}
 %\subtitle{Подназвание доклада}
-%\date{17 ноября 2021 г.}
+\date{27 мая 2022 г.}
 \author{Кобрин Илай Александрович}
 
 % Russian
@@ -73,56 +73,69 @@
 
 \maketitle
 
+\begin{frame}{Актуальность}
+Программное обеспечение стремительно развивается, принося с собой множество
+программных ошибок, поэтому необходимо его тестировать.
+
+Программист самостоятельно может тестировать ПО только на ограниченном наборе
+тестов, поэтому необходимо разрабатывать методы автоматического тестирования.
+
+Одной из самых распространенных ошибок в программах является ошибка
+целочисленного переполнения.
+%\begin{itemize}
+%\end{itemize}
+\end{frame}
+
 \begin{frame}{Введение}
 \begin{itemize}
     \item \textbf{Символьная интерпретация} --- метод автоматического тестирования
         программ, при котором происходит интерпретация программы, где конкретным
         значениям переменных, зависящих от входных данных, сопоставляются
         символьные переменные, принимающие произвольные значения.
-    \item \textbf{Фаззинг} --- метод автоматического тестирования программ, при котором
-        программе на вход подается множество наборов входных данных, после чего
-        анализируется реакция программы и генерируются новые входные данные.
-    \item Совместная работа фаззинга и символьной интерпретации называется
-        \textbf{гибридным фаззингом}.
+    \item \textbf{Предикат пути} --- система из уравнений и неравенств над
+        символьными переменными и константными значениями, решение которой
+        обеспечивает прохождение потока управления по исследуемому пути.
+    \item \textbf{Предикат безопасности} --- дополнительные условия на предикат пути,
+        которые позволяют обнаружить ошибку в программе.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Построение предиката безопасности}
-\textbf{Предикат безопасности}~--- дополнительные условия на предикат пути,
-которые позволяют обнаружить ошибку в программе.
-
-\begin{center}
-\tiny
-\begin{tabular}{ l  l  l  l }\toprule
-\textbf{Символьное состояние} & \textbf{Инструкция} & \textbf{Множество формул} & \textbf{Предикат пути} \\
-\hline
-$rax = \phi_1, rbx = \phi_2$ & --- & $S = \varnothing$ & $\prod = true$ \\
-\hline
-$rax = \phi_1, rbx = \phi_3$ & \texttt{add rbx, 2} & $S = \{\phi_3 = \phi_2 +
-2\}$ & $\prod = true$ \\
-\hline
-\multirow{2}{*}{$rax = \phi_1, rbx = \phi_3$} & \texttt{cmp rbx, 2048} & \multirow{2}{*}{$S =
-\{\phi_3 = \phi_2 + 2\}$} & \multirow{2}{*}{$\prod = (\phi_3 < 2048)$} \\
-& \texttt{jge .out} &&\\
-\hline
-\multirow{2}{*}{$rax = \phi_1, rbx = \phi_3$} & \texttt{cmp rbx, 0} & \multirow{2}{*}{$S =
-\{\phi_3 = \phi_2 + 2\}$} & \multirow{2}{*}{$\prod = (\phi_3 < 2048) \land
-(\phi_3 \geq 0)$} \\
-& \texttt{jl .out} &&\\
-\hline
-$rax = \phi_1, rbx = \phi_3$ & \texttt{mov [rax + rbx], 1} &
-$S = \{\phi_3 = \phi_2 + 2, \phi_4 = \phi_1 + \phi_3\}$ & $\prod = (\phi_3 < 2048) \land (\phi_3 \geq 0)$ \\
-\midrule
-\multicolumn{4}{c}{\textbf{Предикат безопасности}} \\
-\multicolumn{4}{c}{$\prod_{security} = (\phi_3 < 2048) \land (\phi_3 \geq 0)
-\land (\phi_4 = 0)$} \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{frame}
+%\begin{frame}{Построение предиката безопасности}
+%\textbf{Предикат безопасности}~--- дополнительные условия на предикат пути,
+%которые позволяют обнаружить ошибку в программе.
+%
+%\begin{center}
+%\tiny
+%\begin{tabular}{ l  l  l  l }\toprule
+%\textbf{Символьное состояние} & \textbf{Инструкция} & \textbf{Множество формул} & \textbf{Предикат пути} \\
+%\hline
+%$rax = \phi_1, rbx = \phi_2$ & --- & $S = \varnothing$ & $\prod = true$ \\
+%\hline
+%$rax = \phi_1, rbx = \phi_3$ & \texttt{add rbx, 2} & $S = \{\phi_3 = \phi_2 +
+%2\}$ & $\prod = true$ \\
+%\hline
+%\multirow{2}{*}{$rax = \phi_1, rbx = \phi_3$} & \texttt{cmp rbx, 2048} & \multirow{2}{*}{$S =
+%\{\phi_3 = \phi_2 + 2\}$} & \multirow{2}{*}{$\prod = (\phi_3 < 2048)$} \\
+%& \texttt{jge .out} &&\\
+%\hline
+%\multirow{2}{*}{$rax = \phi_1, rbx = \phi_3$} & \texttt{cmp rbx, 0} & \multirow{2}{*}{$S =
+%\{\phi_3 = \phi_2 + 2\}$} & \multirow{2}{*}{$\prod = (\phi_3 < 2048) \land
+%(\phi_3 \geq 0)$} \\
+%& \texttt{jl .out} &&\\
+%\hline
+%$rax = \phi_1, rbx = \phi_3$ & \texttt{mov [rax + rbx], 1} &
+%$S = \{\phi_3 = \phi_2 + 2, \phi_4 = \phi_1 + \phi_3\}$ & $\prod = (\phi_3 < 2048) \land (\phi_3 \geq 0)$ \\
+%\midrule
+%\multicolumn{4}{c}{\textbf{Предикат безопасности}} \\
+%\multicolumn{4}{c}{$\prod_{security} = (\phi_3 < 2048) \land (\phi_3 \geq 0)
+%\land (\phi_4 = 0)$} \\
+%\bottomrule
+%\end{tabular}
+%\end{center}
+%\end{frame}
 
 \begin{frame}{Постановка задачи}
-Необходимо реализовать метод поиска ошибок целочисленного переполнения в
+Необходимо разработать и реализовать метод поиска ошибок целочисленного переполнения в
 бинарном коде с помощью динамической символьной интерпретации, который
 \begin{itemize}
     \item Строит предикат безопасности для ошибок целочисленного переполнения;
@@ -143,20 +156,27 @@ Triton и DynamoRIO.
 
 Примеры других известных решений:
 \begin{itemize}
-    \item KLEE
-    \item Mayhem
-    \item Google Sanitizers
-    \item SAVIOR
-    \item IntScope
+    \item KLEE --- инструмент для символьной интерпретации для увеличения
+        покрытия и поиска ошибок
+    \item Mayhem --- система для обнаружения ошибок переполнения буфера и их
+        эксплуатации
+    \item Google Sanitizers --- инструменты для обнаружения ошибок в программе
+        во время ее работы
+    \item SAVIOR --- фреймворк для гибридного тестирования, нацеленный на поиск
+        ошибок
+    \item ParmeSan --- инструмент для фаззинга с обратной связью по санитайзерам
+    \item IntScope --- инструмент для поиска ошибок целочисленного переполнения
+        при помощи символьной интерпретациии
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Схема проверки предиката безопасности}
 \begin{itemize}
-    \item Составляем предикат безопасности
-    \item Применяем слайсинг к предикату пути
-    \item Конъюнкция предиката безопасности и получившегося предиката пути
-    \item Проверка выполнимости конъюнкции с помощью Z3
+    \item Составляем предикат безопасности на равенство флагов
+        \texttt{CF}/\texttt{OF} единице
+    \item Применяем слайсинг к предикату пути (удаление избыточных ограничений)
+    \item Конъюнкция предиката безопасности и слайса предиката пути
+    \item Проверка выполнимости конъюнкции с помощью математического решателя
     \item Если SAT - печатаем предупреждение и сохраняем файл
 \end{itemize}
 \end{frame}
@@ -168,52 +188,27 @@ Triton и DynamoRIO.
         большому количеству ложных срабатываний.
     \item \textbf{Источник}~--- арифметическая инструкция, в которой потенциально
         может произойти переполнение значения
-    \item \textbf{Сток}~--- место, в котором используется переполненное ранее
-        значение.
-    \item Сначала находим потенциальный \textbf{источник}; если нашли
-        \textbf{сток}, в котором он используется, проверяем на переполнение.
-    \item Создаем два предиката для беззнакового и знакового переполнений, где
-        проверяем равенство флагов \texttt{CF} и \texttt{OF} единице.
+    \item Виды \textbf{стоков}:
+        \begin{itemize}
+            \item Условные переходы
+            \item Разыменование указателя
+            \item Аргументы функций
+        \end{itemize}
 \end{itemize}
-\end{frame}
-
-\begin{frame}{Виды sink'ов}
-    Мы выделяем следующие места, где переполнение может привести к наиболее
-    неприятным последствиям:
-    \begin{itemize}
-        \item Условные переходы
-        \item Разыменование указателя
-        \item Аргументы функций
-    \end{itemize}
-    Особенно опасно переполнение в аргументах \texttt{malloc}, \texttt{memcpy} и
-    т.п.
-    Для таких функций проверяем все символьные аргументы, для произвольных функций -
-    только первые три аргумента.
 \end{frame}
 
 \begin{frame}{Определение знаковости}
 \begin{itemize}
     \item На уровне ассемблера не всегда возможно определить, является ли
-        значение sink'a знаковым или беззнаковым.
+        значение стока знаковым или беззнаковым.
     \item Для обнаружения знаковости используем следующий алгоритм:
     \begin{itemize}
         \item Идем в обратном порядке по всем условным переходам, в которых были использованы
-            переменные, которые есть в sink'e
+            переменные, которые есть в стоке
         \item Из найденных условных переходов узнаем знаковость
     \end{itemize}
     \item Также можем определить знаковость, если соответствующие входные данные
         были обработаны функцией \texttt{strto*l}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Дополнительные условия на предикат безопасности}
-\begin{itemize}
-    \item В аргументе \texttt{*alloc} функций хотим
-        переполнить значение так, чтобы результат был меньше изначального конкретного
-        значения (но не нулем)
-    \item В аргументе \texttt{memcpy} и т.п. хотим
-        переполнить так, чтобы результат был больше изначального конкретного
-        значения
 \end{itemize}
 \end{frame}
 
@@ -240,19 +235,6 @@ int main() {
 \end{frame}
 
 \begin{frame}{Juliet Dynamic}
-Для проверки эффективности работы предикатов была сделана тестовая система на
-основе набора тестов Juliet.
-\begin{itemize}
-    \item Собираем и запускаем тесты, собираем результаты TP, TN, FP, FN на
-        основе вывода Sydr
-    \item Проверяем на основе сгенерированного файла корректность результата с
-        помощью санитайзеров
-    \item Выводим отдельно результаты на основе вывода Sydr и результаты,
-        верифицированные санитайзерами
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Результаты Juliet Dynamic}
 \footnotesize
 \begin{adjustwidth}{-2.5em}{-2.5em}
     \begin{tabular}{ l r | r r >{\columncolor[gray]{0.9}}r|
@@ -269,31 +251,80 @@ Int Overflow to BOF & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
 \end{adjustwidth}
 \end{frame}
 
-\begin{frame}[fragile]{FreeImage}
-С помощью предикатов безопасности было найдено переполнение целого типа в
-программе FreeImage при вызове функции \texttt{fseek}:
+\begin{frame}[fragile]{FreeImage и xlnt}
+С помощью разработанного метода было найдено целочисленное переполнение в
+проекте \textbf{FreeImage} при вызове функции \texttt{fseek}:
 
+\texttt{unsigned off\_head, off\_setup, off\_image, i;}\\
+\texttt{...}\\
+\texttt{fseek(ifp, off\_setup + 792, SEEK\_SET);} \\[2em]
 
-\begin{lstlisting}[language=C, basicstyle=\footnotesize,
-                   xleftmargin=2em]
-unsigned off_head, off_setup, off_image, i;
-...
-fseek(ifp, off_setup + 792, SEEK_SET);
-\end{lstlisting}
-\end{frame}
+Также ошибка целочисленного переполнения была найдена в проекте \textbf{xlnt}:
 
-\begin{frame}[fragile]{xlnt}
+\texttt{in\_->seekg(static\_cast<std::ptrdiff\_t>(sector\_data\_start()}\\
+\texttt{    + sector\_size() * static\_cast<std::size\_t>(id)));} \\
+\texttt{std::vector<byte> sector(sector\_size(), 0);}
 \end{frame}
 
 \begin{frame}[fragile]{unbound}
+В проекте \textbf{unbound} также была найдена ошибка целочисленного переполнения в
+приведенном фрагменте в 9 строке:
+
+\begin{lstlisting}[language=C,frame=none,basicstyle=\ttfamily, numbers=left,
+                   xleftmargin=2em, numberstyle=\tiny\color{gray}]
+int sign = 0;
+uint32_t i = 0;
+uint32_t seconds = 0;
+
+for(*endptr = nptr; **endptr; (*endptr)++) {
+    switch (**endptr) {
+    ...
+    case '9':
+        i *= 10;
+    ...
+}
+\end{lstlisting}
 \end{frame}
 
 \begin{frame}{Заключение}
 \begin{itemize}
-    \item Реализованы 4 предиката безопасности
-    \item Получена точность 95.59\% в Juliet Dynamic на 11 CWE
-    \item Найдено несколько ошибок в FreeImage
+    \item Был реализован метод поиска ошибок целочисленного переполнения в
+        бинарных файлах методами динамической символьной интерпретации
+    \item Метод протестирован на наборе тестов Juliet и показал высокие
+        результаты
+    \item Найдены ошибки в проектах с открытым исходным кодом FreeImage, xlnt и
+        unbound
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Публикации по теме курсовой работы}
+    \begin{itemize}
+        \item Vishnyakov A., Logunova V., Kobrin E., Kuts D., Parygina D., Fedotov A. Symbolic Security Predicates: Hunt Program Weaknesses. 2021 Ivannikov ISPRAS Open Conference (ISPRAS), IEEE, 2021, pp. 76-85. DOI: 10.1109/ISPRAS53967.2021.00016
+        \item Vishnyakov A., Fedotov A., Kuts D., Novikov A., Parygina D., Kobrin E., Logunova V., Belecky P., Kurmangaleev Sh. Sydr: Cutting Edge Dynamic Symbolic Execution. 2020 Ivannikov ISPRAS Open Conference (ISPRAS), IEEE, 2020, pp. 46-54. DOI: 10.1109/ISPRAS51486.2020.00014
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[standout] \vfill Спасибо за внимание! \vfill \end{frame}
+
+\begin{frame}{Juliet Dynamic}
+Для проверки эффективности работы предикатов была сделана тестовая система на
+основе набора тестов Juliet.
+\begin{itemize}
+    \item Собираем и запускаем тесты, собираем результаты TP, TN, FP, FN на
+        основе вывода Sydr
+    \item Проверяем на основе сгенерированного файла корректность результата с
+        помощью санитайзеров
+    \item Выводим отдельно результаты на основе вывода Sydr и результаты,
+        верифицированные санитайзерами
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Ссылки на результаты}
+\begin{itemize}
+    \item Juliet Dynamic: https://github.com/ispras/juliet-dynamic
+    \item FreeImage: https://sourceforge.net/p/freeimage/bugs/347/
+    \item xlnt: https://github.com/tfussell/xlnt/issues/616
+    \item unbound: https://github.com/NLnetLabs/unbound/issues/637
+\end{itemize}
+\end{frame}
 \end{document}
