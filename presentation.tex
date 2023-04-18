@@ -52,10 +52,9 @@
 \usepackage{multirow}
 \usepackage{colortbl}
 
-\title{Поиск ошибок целочисленного переполнения методами динамической символьной
-интерпретации}
+\title{Символьные предикаты безопасности для поиска ошибок в бинарном коде}
 %\subtitle{Подназвание доклада}
-\date{27 мая 2022 г.}
+\date{27 апреля 2023 г.}
 \author{Кобрин Илай Александрович}
 
 % Russian
@@ -82,15 +81,15 @@
 Программист самостоятельно может тестировать ПО только на ограниченном наборе
 тестов, поэтому необходимо разрабатывать методы автоматического тестирования.
 
-Одной из самых распространенных ошибок в программах является ошибка
-целочисленного переполнения.
+\textbf{Динамическая символьная интерпретация} позволяет строить математическую
+модель программы и находить ошибки путем решения соответствующих систем уравнений и неравенств.
 %\begin{itemize}
 %\end{itemize}
 \end{frame}
 
-\begin{frame}{Символьная интерпретация}
+\begin{frame}{Динамическая символьная интерпретация}
 \begin{itemize}
-    \item \textbf{Символьная интерпретация} --- метод автоматического тестирования
+    \item \textbf{Динамическая символьная интерпретация} --- метод автоматического тестирования
         программ, при котором происходит интерпретация программы, где конкретным
         значениям переменных, зависящих от входных данных, сопоставляются
         символьные переменные, принимающие произвольные значения.
@@ -137,18 +136,18 @@
 %\end{frame}
 
 \begin{frame}{Постановка задачи}
-Необходимо разработать и реализовать метод поиска ошибок целочисленного переполнения в
-бинарном коде с помощью динамической символьной интерпретации, который
+Необходимо разработать и реализовать метод построения и проверки символьных
+предикатов безопасности для поиска ошибок в бинарном коде с помощью динамической
+символьной интерпретации, который должен
 \begin{itemize}
-    \item Строит предикат безопасности для ошибок целочисленного переполнения;
-    \item Находит источники и стоки ошибок;
-    \item Находит ошибки для различных размеров целочисленных типов
-    \item Определяет знаковость результата арифметической операции, приводящей к
-        переполнению, когда это возможно;
-    \item Генерирует входные данные, приводящие к проявлению ошибки;
-    \item В определенных случаях подбирает такие входные данные, чтобы
-        последствия ошибки переполнения вероятнее приводили к аварийному
-        завершению.
+    \item Находить ошибки целочисленного переполнения, выхода за границы
+        массива, деления на ноль и разыменования нулевого указателя;
+    \item Для ошибок целочисленного переполнения находить источники ошибок и их
+        стоки;
+    \item Генерировать входные данные, которые приведут к проявлению ошибки;
+    \item Для ошибок целочисленного переполнения и выхода за границу массива
+        пытаться подбирать такие входные данные, чтобы последствия проявления
+        ошибки были более серьезными.
 \end{itemize}
 \end{frame}
 
@@ -172,139 +171,125 @@ Triton и DynamoRIO.
 
 \begin{frame}{Схема проверки предиката безопасности}
 \begin{itemize}
-    \item Составляем предикат безопасности на равенство флагов
-        \texttt{CF}/\texttt{OF} единице
-    \item Применяем слайсинг к предикату пути (удаление избыточных ограничений)
-    \item Конъюнкция предиката безопасности и слайса предиката пути
+    \item Интерпретируем программу, анализируем каждую инструкцию на пути
+        выполнения
+    \item Составляем предикат безопасности для обнаружения конкретной ошибки
+    \item Конъюнкция предиката безопасности и предиката пути
     \item Проверка выполнимости конъюнкции с помощью математического решателя
     \item Если выполнима --- печатаем предупреждение и сохраняем файл
         для воспроизведения ошибки
+    \item Для ошибок разыменования нулевого указателя и деления на ноль
+        составляем уравнения на равенство адреса и делителя нулю
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Понятие источника и стока ошибки}
+%\begin{frame}{Разыменование нулевого указателя и деление на ноль}
+%\begin{itemize}
+%    \item Простые, но распространенные в ПО ошибки.
+%    \item Для ошибок разыменования нулевого указателя ищем инструкции,
+%        разыменовывающие адрес. Составляем уравнение на равенство символьного
+%        адреса нулю.
+%    \item Для инструкций деления составляем уравнение на равенство символьного
+%        делителя нулю.
+%\end{itemize}
+%\end{frame}
+
+\begin{frame}{Выход за границу массива}
 \begin{itemize}
-    \item Из-за слишком частых арифметических инструкций проверять на
-        переполнение каждую слишком расточительно, а также может привести к
-        большому количеству ложных срабатываний.
-    \item \textbf{Источник}~--- арифметическая инструкция, в которой потенциально
-        может произойти переполнение значения
-    \item Виды \textbf{стоков}:
-        \begin{itemize}
-            \item Условные переходы
-            \item Разыменование указателя
-            \item Аргументы функций
-        \end{itemize}
+    \item Строим предикат безопасности для инструкций, разыменовывающих адрес.
+    \item Находим границы с помощью теневой кучи, теневого стека или с помощью
+        эвристического подхода.
+    \item Составляем предикат безопасности в виде неравенства на то, может ли
+        адрес выходить за границы.
+    \item Составляем дополнительные условия, чтобы попытаться перезаписать адрес
+        возврата из функции или разыменовать отрицательный адрес.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Определение знаковости}
+\begin{frame}{Целочисленного переполнение}
 \begin{itemize}
-    \item На уровне ассемблера не всегда возможно определить, является ли
-        значение стока знаковым или беззнаковым
-    \item Для обнаружения знаковости используем следующий алгоритм:
-    \begin{itemize}
-        \item Идем в обратном порядке по всем условным переходам, в которых были использованы
-            переменные, которые есть в стоке
-        \item Из найденных условных переходов узнаем знаковость
-    \end{itemize}
-    \item Также можем определить знаковость, если соответствующие входные данные
-        были обработаны функцией \texttt{strto*l}
+    \item Строим предикат безопасности для арифметических инструкций,
+        представляющий из себя равенство флагов \texttt{CF}/\texttt{OF} единице.
+    \item Так как арифметики в программах очень много, проверяем предикат
+        безопасности только если был найден соответствующий сток ошибки.
+    \item Стоками ошибки являются: условный переход, разыменование
+        адреса, аргументы опасных функций (\texttt{malloc}, \texttt{memcpy} и
+        т.п.),
+        аргументы остальных функций.
+    \item Знаковость переполнения определяем по ранее встретившимся инструкциям
+        условных переходов.
+    \item Для функций копирования и функций выделения памяти составляем предикат
+        безопасности так, чтобы ошибка переполнения вероятнее привела к
+        дальнейшему выходу за границы массива.
 \end{itemize}
-Например, инструкция условного перехода \texttt{JL} говорит о знаковости
-стока.
 \end{frame}
 
-\begin{frame}[fragile]{Пример Integer Overflow to Buffer Overflow}
-    Входные данные: +00000000002\\
-    Ответ: +01073741825 \\
-    Разрядность: 32 бита
-\begin{lstlisting}[language=C, basicstyle=\footnotesize, numbers=left,
-                   xleftmargin=2em, numberstyle=\tiny\color{gray}]
-int main() {
-    int size;
-    fscanf(stdin, "%d", &size);
-    if (size <= 0) return 1;
-    size_t i;
-    int *p = malloc(size * sizeof(int));
-    if (p == NULL) return 1;
-    for (i = 0; i < (size_t)size; i++) {
-        p[i] = 0;
-    }
-    printf("%d\n", p[0]);
-    free(p);
-}
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}{Juliet Dynamic}
+\begin{frame}{Оценка точности на наборе тестов Juliet}
 \footnotesize
 \begin{adjustwidth}{-2.5em}{-2.5em}
-    \begin{tabular}{ l r | r r >{\columncolor[gray]{0.9}}r|
+\begin{tabular}{ l r | r r >{\columncolor[gray]{0.9}}r|
 r r >{\columncolor[gray]{0.9}}r}\toprule
 \multirow{2}{*}{\textbf{CWE}} & \multirow{2}{*}{\textbf{P=N}} &
 \multicolumn{3}{c|}{\textbf{Текстовые ошибки}} &
 \multicolumn{3}{c}{\textbf{Верификация}} \\
 && \textbf{TPR} & \textbf{TNR} & \textbf{ACC} & \textbf{TPR} & \textbf{TNR} & \textbf{ACC} \\
-Integer Overflow & 2580 & 99.92\% & 90.89\% & 95.41\% & 98.10\% & 90.89\% & 94.50\% \\
-Integer Underflow & 1922 & 99.90\% & 91\% & 95.45\% & 97.45\% & 91\% & 94.22\% \\
+Stack BOF & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Heap BOF & 376 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Buffer Underwrite & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Buffer Overread & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Buffer Underread & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Integer Overflow & 2580 & 99.92\% & 90.89\% & 95.41\% & 99.92\% & 90.89\% & 95.41\% \\
+Integer Underflow & 1922 & 99.90\% & 91\% & 95.45\% & 99.90\% & 91\% & 95.45\% \\
+Unexpected Sign Ext & 752 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Signed to Unsigned & 752 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Divide by Zero & 564 & 66.67\% & 100\% & 83.33\% & 66.67\% & 100\% & 83.33\% \\
 Int Overflow to BOF & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+\midrule
+\textbf{ИТОГО} & 7886 & 97.57\% & 94.83\% & 96.20\% & 97.57\% & 94.83\% & 96.20\% \\
 \bottomrule
 \end{tabular}
 \end{adjustwidth}
 \end{frame}
 
-\begin{frame}[fragile]{FreeImage и xlnt}
-С помощью разработанного метода было найдено целочисленное переполнение в
-проекте \textbf{FreeImage} при вызове функции \texttt{fseek}:
-
-\texttt{unsigned off\_head, off\_setup, off\_image, i;}\\
-\texttt{...}\\
-\texttt{fseek(ifp, off\_setup + 792, SEEK\_SET);} \\[2em]
-
-Также ошибка целочисленного переполнения была найдена в проекте \textbf{xlnt}:
-
-\texttt{in\_->seekg(static\_cast<std::ptrdiff\_t>(sector\_data\_start()}\\
-\texttt{    + sector\_size() * static\_cast<std::size\_t>(id)));} \\
-\texttt{std::vector<byte> sector(sector\_size(), 0);}
-\end{frame}
-
-\begin{frame}[fragile]{unbound}
-В проекте \textbf{unbound} также была найдена ошибка целочисленного переполнения в
-приведенном фрагменте в 9 строке:
-
-\begin{lstlisting}[language=C,frame=none,basicstyle=\ttfamily, numbers=left,
-                   xleftmargin=2em, numberstyle=\tiny\color{gray}]
-int sign = 0;
-uint32_t i = 0;
-uint32_t seconds = 0;
-
-for(*endptr = nptr; **endptr; (*endptr)++) {
-    switch (**endptr) {
-    ...
-    case '9':
-        i *= 10;
-    ...
-}
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}{Заключение}
+\begin{frame}{Результаты практического применения}
+Были найдены ошибки в следующих проектах с открытым исходным кодом:
 \begin{itemize}
-    \item Был разработан и реализован метод поиска ошибок целочисленного переполнения в
-        бинарных файлах методами динамической символьной интерпретации
-    \item Метод протестирован на наборе тестов Juliet и показал высокие
-        результаты
-    \item Найдены новые ошибки в проектах с открытым исходным кодом FreeImage, xlnt и
-        unbound
+    \item FreeImage (целочисленное переполнение)
+    \item rizin (целочисленное переполнение, ведущее к выходу за границы
+        массива)
+    \item xlnt (целочисленное переполнение и выход за границу массива)
+    \item unbound (целочисленное переполнение)
+    \item hdp (деление на ноль)
+    \item miniz (целочисленное переполнение)
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Публикации по теме курсовой работы}
-    \begin{itemize}
-        \item Vishnyakov A., Logunova V., Kobrin E., Kuts D., Parygina D., Fedotov A. Symbolic Security Predicates: Hunt Program Weaknesses. 2021 Ivannikov ISPRAS Open Conference (ISPRAS), IEEE, 2021, pp. 76-85. DOI: 10.1109/ISPRAS53967.2021.00016
-        \item Vishnyakov A., Fedotov A., Kuts D., Novikov A., Parygina D., Kobrin E., Logunova V., Belecky P., Kurmangaleev Sh. Sydr: Cutting Edge Dynamic Symbolic Execution. 2020 Ivannikov ISPRAS Open Conference (ISPRAS), IEEE, 2020, pp. 46-54. DOI: 10.1109/ISPRAS51486.2020.00014
-    \end{itemize}
+\begin{frame}{Заключение}
+Был разработан и реализован метод построения и проверки символьных
+предикатов безопасности для поиска ошибок в бинарном коде.
+\begin{itemize}
+    \item Метод позволяет находить ошибки разыменования нулевого указателя,
+        выхода за границы массива, целочисленного переполнения и деления на ноль
+    \item Метод протестирован на наборе тестов Juliet и показал высокую
+        точность в 96.20\%
+    \item Найдено множество ошибок в проектах с открытым исходным кодом:
+        FreeImage, rizin, xlnt, unbound, hdp и miniz
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Публикации}
+\footnotesize
+Результаты были опубликованы:
+\begin{itemize}
+    \item Vishnyakov A., Logunova V., Kobrin E., Kuts D., Parygina D., Fedotov A. Symbolic Security Predicates: Hunt Program Weaknesses. 2021 Ivannikov ISPRAS Open Conference (ISPRAS), IEEE, 2021, pp. 76-85. DOI: 10.1109/ISPRAS53967.2021.00016
+    \item Вишняков А.В., Кобрин И.А., Федотов А.Н. Поиск ошибок в бинарном коде методами динамической символьной интерпретации. Труды Института системного программирования РАН, том 34, вып. 2, 2022, стр. 25-42. DOI: 10.15514/ISPRAS-2022-34(2)-3
+\end{itemize}
+
+Публикации по теме работы:
+\begin{itemize}
+    \item Vishnyakov A., Fedotov A., Kuts D., Novikov A., Parygina D., Kobrin E., Logunova V., Belecky P., Kurmangaleev Sh. Sydr: Cutting Edge Dynamic Symbolic Execution. 2020 Ivannikov ISPRAS Open Conference (ISPRAS), IEEE, 2020, pp. 46-54. DOI: 10.1109/ISPRAS51486.2020.00014
+    \item Vishnyakov A., Kuts D., Logunova V., Parygina D., Kobrin E., Savidov G., Fedotov A. Sydr-Fuzz: Continuous Hybrid Fuzzing and Dynamic Analysis for Security Development Lifecycle. 2022 Ivannikov ISPRAS Open Conference (ISPRAS), IEEE, 2022, pp. 111-123. DOI: 10.1109/ISPRAS57371.2022.10076861
+\end{itemize}
 \end{frame}
 
 \appendix
@@ -323,12 +308,197 @@ for(*endptr = nptr; **endptr; (*endptr)++) {
 \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{FreeImage}
+В проекте FreeImage были найдены ошибки целочисленного переполнения в следующих
+местах:
+
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:freeimage_bmp_overflow]
+unsigned off_head, off_setup, off_image, i;
+...
+fseek(ifp, off_setup + 792, SEEK_SET);
+...
+\end{lstlisting}
+
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:freeimage_tiff_overflow]
+int doff;
+...
+fseek(ifp, doff + base, SEEK_SET);
+...
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{FreeImage}
+Неявное преобразование типа \texttt{long} к \texttt{int}:
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:freeimage-tiff-implicit]
+int parse_tiff(int base);
+...
+parse_tiff(thumb_offset + 12);
+\end{lstlisting}
+
+Целочисленное переполнение в условном переходе:
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:freeimage-condition-overflow]
+if (*len * tagtype_dataunit_bytes[(*type <= LIBRAW_EXIFTAG_TYPE_IFD8) ? *type : 0] > 4)
+{
+    fseek(ifp, get4() + base, SEEK_SET);
+}
+\end{lstlisting}
+
+Беззнаковое целочисленное переполнение при вычислении ширины:
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:freeimage-width-overflow]
+width = raw_width - left_margin - (get4() & 7);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{rizin}
+В проекте rizin была найдена ошибка целочисленного переполнения, приводящая к
+выходу за границы массива:
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:rizin-overflow]
+symbols_size = (symbols_count + 1) * 2 * sizeof(struct symbol_t);
+
+if (symbols_size < 1) {
+    ht_pp_free(hash);
+    return NULL;
+}
+if (!(symbols = calloc(1, symbols_size))) {
+    ht_pp_free(hash);
+    return NULL;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{rizin}
+Выход за границы массива вследствие переполнения:
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:rizin-oob]
+for (i = 0; i < bin->nsymtab && i < symbols_count; i++) {
+...
+    symbols[j].last = 0;
+    if (inSymtab(hash, symbols[j].name, symbols[j].addr)) {
+        RZ_FREE(symbols[j].name);
+    } else {
+        j++;
+    }
+...
+}
+...
+symbols[j].last = true;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{xlnt}
+Ошибки целочисленного переполнения при умножении и сложении:
+\tiny
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:xlnt-overflow]
+in_->seekg(
+      static_cast<std::ptrdiff_t>(sector_data_start() +
+      sector_size() * static_cast<std::size_t>(id)));
+std::vector<byte> sector(sector_size(), 0);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{xlnt}
+Найденная ошибка выхода за границы массива:
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:xlnt-oob]
+sector_chain
+compound_document::follow_chain(sector_id start,
+                                const sector_chain &table)
+{
+    auto chain = sector_chain();
+    auto current = start;
+    while (current >= 0)
+    {
+        chain.push_back(current);
+        current =
+            table[static_cast<std::size_t>(current)];
+    }
+    return chain;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{unbound}
+Ошибка целочисленного переполнения в unbound:
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:unbound_overflow]
+int sign = 0;
+uint32_t i = 0;
+uint32_t seconds = 0;
+
+for(*endptr = nptr; **endptr; (*endptr)++) {
+    switch (**endptr) {
+    ...
+    case '9':
+        i *= 10;
+    ...
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{hdp}
+Ошибка целочисленного деления на ноль в проекте hdp:
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:hdp-zerodiv]
+int32 buf_size;
+/* we are bounded above by VDATA_BUFFER_MAX */
+buf_size = MIN(total_bytes, VDATA_BUFFER_MAX);
+/* make sure there is at least room for one record in our buffer */
+chunk = buf_size / hsize + 1;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{miniz}
+Ошибки целочисленного переполнения в miniz (зависимость PyTorch):
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:miniz-overflow]
+if (cdir_size < pZip->m_total_files *
+                MZ_ZIP_CENTRAL_DIR_HEADER_SIZE)
+    return mz_zip_set_error(pZip,
+               MZ_ZIP_INVALID_HEADER_OR_CORRUPTED);
+\end{lstlisting}
+\end{frame}
+
 \begin{frame}{Ссылки на результаты}
 \begin{itemize}
     \item Juliet Dynamic: https://github.com/ispras/juliet-dynamic
     \item FreeImage: https://sourceforge.net/p/freeimage/bugs/347/
-    \item xlnt: https://github.com/tfussell/xlnt/issues/616
+    \item rizin: https://github.com/rizinorg/rizin/issues/2935
+    \item xlnt: https://github.com/tfussell/xlnt/issues/616,
+        https://github.com/tfussell/xlnt/issues/626
     \item unbound: https://github.com/NLnetLabs/unbound/issues/637
+    \item hdp: https://bugs.launchpad.net/ubuntu/+source/libhdf4/+bug/1915417
+    \item miniz: https://github.com/richgel999/miniz/pull/238
 \end{itemize}
 \end{frame}
 \end{document}

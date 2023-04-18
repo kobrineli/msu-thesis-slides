@@ -1,18 +1,11 @@
-\frametitle{unbound}
-В проекте \textbf{unbound} также была найдена ошибка целочисленного переполнения в
-приведенном фрагменте в 9 строке:
-
-\begin{lstlisting}[language=C,frame=none,basicstyle=\ttfamily, numbers=left,
-                   xleftmargin=2em, numberstyle=\tiny\color{gray}]
-int sign = 0;
-uint32_t i = 0;
-uint32_t seconds = 0;
-
-for(*endptr = nptr; **endptr; (*endptr)++) {
-    switch (**endptr) {
-    ...
-    case '9':
-        i *= 10;
-    ...
-}
+\frametitle{miniz}
+Ошибки целочисленного переполнения в miniz (зависимость PyTorch):
+\begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
+                   xleftmargin=2em,
+                   captionpos=b,
+                   label=lst:miniz-overflow]
+if (cdir_size < pZip->m_total_files *
+                MZ_ZIP_CENTRAL_DIR_HEADER_SIZE)
+    return mz_zip_set_error(pZip,
+               MZ_ZIP_INVALID_HEADER_OR_CORRUPTED);
 \end{lstlisting}
