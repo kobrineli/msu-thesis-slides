@@ -471,7 +471,8 @@ for(*endptr = nptr; **endptr; (*endptr)++) {
 int32 buf_size;
 /* we are bounded above by VDATA_BUFFER_MAX */
 buf_size = MIN(total_bytes, VDATA_BUFFER_MAX);
-/* make sure there is at least room for one record in our buffer */
+// make sure there is at least room
+// for one record in our buffer
 chunk = buf_size / hsize + 1;
 \end{lstlisting}
 \end{frame}
