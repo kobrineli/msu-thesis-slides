@@ -301,6 +301,45 @@ Int Overflow to BOF & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
 \appendix
 \begin{frame}[standout] \vfill Спасибо за внимание! \vfill \end{frame}
 
+\begin{frame}{Определение знаковости}
+\begin{itemize}
+    \item На уровне ассемблера не всегда возможно определить, является ли
+        значение стока знаковым или беззнаковым
+    \item Для обнаружения знаковости используем следующий алгоритм:
+    \begin{itemize}
+        \item Идем в обратном порядке по всем условным переходам, в которых были использованы
+            переменные, которые есть в стоке
+        \item Из найденных условных переходов узнаем знаковость
+    \end{itemize}
+    \item Также можем определить знаковость, если соответствующие входные данные
+        были обработаны функцией \texttt{strto*l}
+\end{itemize}
+Например, инструкция условного перехода \texttt{JL} говорит о знаковости
+стока.
+\end{frame}
+
+\begin{frame}[fragile]{Пример Integer Overflow to Buffer Overflow}
+    Входные данные: +00000000002\\
+    Ответ: +01073741825 \\
+    Разрядность: 32 бита
+\begin{lstlisting}[language=C, basicstyle=\footnotesize, numbers=left,
+                   xleftmargin=2em, numberstyle=\tiny\color{gray}]
+int main() {
+    int size;
+    fscanf(stdin, "%d", &size);
+    if (size <= 0) return 1;
+    size_t i;
+    int *p = malloc(size * sizeof(int));
+    if (p == NULL) return 1;
+    for (i = 0; i < (size_t)size; i++) {
+        p[i] = 0;
+    }
+    printf("%d\n", p[0]);
+    free(p);
+}
+\end{lstlisting}
+\end{frame}
+
 \begin{frame}{Juliet Dynamic}
 Для проверки эффективности работы предикатов была сделана тестовая система на
 основе набора тестов Juliet.
