@@ -1,7 +1,7 @@
 \frametitle{miniz}
 Ошибки целочисленного переполнения в miniz (зависимость PyTorch):
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:miniz-overflow]
 if (cdir_size < pZip->m_total_files *

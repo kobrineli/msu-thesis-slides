@@ -22,14 +22,14 @@
 \headcommand {\beamer@framepages {11}{11}}
 \headcommand {\slideentry {0}{0}{12}{12/12}{}{0}}
 \headcommand {\beamer@framepages {12}{12}}
-\headcommand {\gdef \insertmainframenumber {11}}
-\headcommand {\partentry {{\cyrillictext \CYRP \cyrr \cyri \cyrl \cyro \cyrzh \cyre \cyrn \cyri \cyre }}{1}}
-\headcommand {\beamer@partpages {1}{12}}
-\headcommand {\beamer@sectionpages {1}{12}}
-\headcommand {\beamer@subsectionpages {1}{12}}
-\headcommand {\beamer@appendixpages {13}}
-\headcommand {\slideentry {0}{0}{13}{13/13}{}{1}}
+\headcommand {\slideentry {0}{0}{13}{13/13}{}{0}}
 \headcommand {\beamer@framepages {13}{13}}
+\headcommand {\gdef \insertmainframenumber {12}}
+\headcommand {\partentry {{\cyrillictext \CYRP \cyrr \cyri \cyrl \cyro \cyrzh \cyre \cyrn \cyri \cyre }}{1}}
+\headcommand {\beamer@partpages {1}{13}}
+\headcommand {\beamer@sectionpages {1}{13}}
+\headcommand {\beamer@subsectionpages {1}{13}}
+\headcommand {\beamer@appendixpages {14}}
 \headcommand {\slideentry {0}{0}{14}{14/14}{}{1}}
 \headcommand {\beamer@framepages {14}{14}}
 \headcommand {\slideentry {0}{0}{15}{15/15}{}{1}}
@@ -56,10 +56,12 @@
 \headcommand {\beamer@framepages {25}{25}}
 \headcommand {\slideentry {0}{0}{26}{26/26}{}{1}}
 \headcommand {\beamer@framepages {26}{26}}
-\headcommand {\beamer@partpages {13}{26}}
-\headcommand {\beamer@subsectionpages {13}{26}}
-\headcommand {\beamer@sectionpages {13}{26}}
-\headcommand {\beamer@documentpages {26}}
+\headcommand {\slideentry {0}{0}{27}{27/27}{}{1}}
+\headcommand {\beamer@framepages {27}{27}}
+\headcommand {\beamer@partpages {14}{27}}
+\headcommand {\beamer@subsectionpages {14}{27}}
+\headcommand {\beamer@sectionpages {14}{27}}
+\headcommand {\beamer@documentpages {27}}
 \headcommand {\gdef \inserttotalframenumber {13}}
-\headcommand {\gdef \inserttotalframenumber {11}}
+\headcommand {\gdef \inserttotalframenumber {12}}
 \headcommand {\gdef \appendixtotalframenumber {13}}

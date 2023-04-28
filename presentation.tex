@@ -147,10 +147,7 @@
         массива, деления на ноль и разыменования нулевого указателя;
     \item Для ошибок целочисленного переполнения находить источники ошибок и их
         стоки;
-    \item Генерировать входные данные, которые приведут к проявлению ошибки;
-    \item Для ошибок целочисленного переполнения и выхода за границу массива
-        пытаться подбирать такие входные данные, чтобы последствия проявления
-        ошибки были более серьезными.
+    \item Генерировать входные данные, которые приведут к проявлению ошибки.
 \end{itemize}
 \end{frame}
 
@@ -230,30 +227,51 @@ Triton и DynamoRIO.
 \end{frame}
 
 \begin{frame}{Оценка точности на наборе тестов Juliet}
-\footnotesize
+Для оценки точности символьных предикатов безопасности была сделана тестовая система на
+основе набора тестов Juliet.
+\begin{itemize}
+    \item Собираем и запускаем тесты, измеряем истинно положительные, истинно
+        отрицательные, ложно положительные и ложно отрицательные срабатывания на
+        основе текстового вывода
+    \item Верифицируем результат на основе срабатываний санитайзеров при запуске
+        на сгенерированном файле
+    \item Считаем отдельно точность (ACC) на основе текстового вывода и на
+        основе верификации санитайзерами
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Оценка точности на наборе тестов Juliet}
+\scriptsize
 \begin{adjustwidth}{-2.5em}{-2.5em}
 \begin{tabular}{ l r | r r >{\columncolor[gray]{0.9}}r|
 r r >{\columncolor[gray]{0.9}}r}\toprule
-\multirow{2}{*}{\textbf{CWE}} & \multirow{2}{*}{\textbf{P=N}} &
+\multirow{2}{*}{\textbf{CWE}} & \multirow{2}{*}{\textbf{Кол-во}} &
 \multicolumn{3}{c|}{\textbf{Текстовые ошибки}} &
 \multicolumn{3}{c}{\textbf{Верификация}} \\
 && \textbf{TPR} & \textbf{TNR} & \textbf{ACC} & \textbf{TPR} & \textbf{TNR} & \textbf{ACC} \\
-Stack BOF & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
-Heap BOF & 376 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
-Buffer Underwrite & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
-Buffer Overread & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
-Buffer Underread & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
-Integer Overflow & 2580 & 99.92\% & 90.89\% & 95.41\% & 99.92\% & 90.89\% & 95.41\% \\
-Integer Underflow & 1922 & 99.90\% & 91\% & 95.45\% & 99.90\% & 91\% & 95.45\% \\
-Unexpected Sign Ext & 752 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
-Signed to Unsigned & 752 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
-Divide by Zero & 564 & 66.67\% & 100\% & 83.33\% & 66.67\% & 100\% & 83.33\% \\
-Int Overflow to BOF & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Stack BOF & 376 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Heap BOF & 752 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Buffer Underwrite & 376 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Buffer Overread & 376 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Buffer Underread & 376 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Integer Overflow & 5160 & 99.92\% & 90.89\% & 95.41\% & 99.92\% & 90.89\% & 95.41\% \\
+Integer Underflow & 3844 & 99.90\% & 91\% & 95.45\% & 99.90\% & 91\% & 95.45\% \\
+Unexpected Sign Ext & 1504 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Signed to Unsigned & 1504 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
+Divide by Zero & 1128 & 66.67\% & 100\% & 83.33\% & 66.67\% & 100\% & 83.33\% \\
+Int Overflow to BOF & 376 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
 \midrule
-\textbf{ИТОГО} & 7886 & 97.57\% & 94.83\% & 96.20\% & 97.57\% & 94.83\% & 96.20\% \\
+\textbf{ИТОГО} & 15772 & 97.57\% & 94.83\% & 96.20\% & 97.57\% & 94.83\% & 96.20\% \\
 \bottomrule
 \end{tabular}
 \end{adjustwidth}
+\center $P$~--- положительные тесты, $N$~--- отрицательные тесты \\
+\center $TP$~--- истинно положительные срабатывания, $FP$~--- ложно положительные срабатывания \\
+\center $TN$~--- истинно отрицательные срабатывания, $FN$~--- ложно отрицательные срабатывания \\
+\hfill \break
+$TPR=\frac{TP}{P}=\frac{TP}{TP+FN}$, $TNR=\frac{TN}{N}=\frac{TN}{TN+FP}$ \\
+\hfill \break
+$ACC=\frac{TP+TN}{TP+TN+FP+FN}$
 \end{frame}
 
 \begin{frame}{Результаты практического применения}
@@ -301,6 +319,23 @@ Int Overflow to BOF & 188 & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
 \appendix
 \begin{frame}[standout] \vfill Спасибо за внимание! \vfill \end{frame}
 
+\begin{frame}{Теневой стек и теневая куча}
+\begin{itemize}
+    \item Теневой стек хранит информацию о фреймах для текущего стека вызовов
+    \begin{itemize}
+        \item Обновляется при вызове функций и возврате из них
+        \item Позволяет получить верхнюю границу буфера на стеке как верхнюю
+            границу фрейма, в котором был выделен буфер
+    \end{itemize}
+    \item Теневая куча хранит информацию о текущих границах буферов, выделенных
+        на куче
+    \begin{itemize}
+        \item Обновляется при вызове функций аллоцирования и освобождения памяти
+        \item Позволяет получать точные границы буферов на куче
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Определение знаковости}
 \begin{itemize}
     \item На уровне ассемблера не всегда возможно определить, является ли
@@ -340,25 +375,12 @@ int main() {
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}{Juliet Dynamic}
-Для проверки эффективности работы предикатов была сделана тестовая система на
-основе набора тестов Juliet.
-\begin{itemize}
-    \item Собираем и запускаем тесты, собираем результаты TP, TN, FP, FN на
-        основе вывода Sydr
-    \item Проверяем на основе сгенерированного файла корректность результата с
-        помощью санитайзеров
-    \item Выводим отдельно результаты на основе вывода Sydr и результаты,
-        верифицированные санитайзерами
-\end{itemize}
-\end{frame}
-
 \begin{frame}[fragile]{FreeImage}
 В проекте FreeImage были найдены ошибки целочисленного переполнения в следующих
 местах:
 
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:freeimage_bmp_overflow]
 unsigned off_head, off_setup, off_image, i;
@@ -368,7 +390,7 @@ fseek(ifp, off_setup + 792, SEEK_SET);
 \end{lstlisting}
 
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:freeimage_tiff_overflow]
 int doff;
@@ -381,7 +403,7 @@ fseek(ifp, doff + base, SEEK_SET);
 \begin{frame}[fragile]{FreeImage}
 Неявное преобразование типа \texttt{long} к \texttt{int}:
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:freeimage-tiff-implicit]
 int parse_tiff(int base);
@@ -391,10 +413,13 @@ parse_tiff(thumb_offset + 12);
 
 Целочисленное переполнение в условном переходе:
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:freeimage-condition-overflow]
-if (*len * tagtype_dataunit_bytes[(*type <= LIBRAW_EXIFTAG_TYPE_IFD8) ? *type : 0] > 4)
+if (*len *
+    tagtype_dataunit_bytes[
+        (*type <= LIBRAW_EXIFTAG_TYPE_IFD8) ? *type : 0]
+        > 4)
 {
     fseek(ifp, get4() + base, SEEK_SET);
 }
@@ -402,7 +427,7 @@ if (*len * tagtype_dataunit_bytes[(*type <= LIBRAW_EXIFTAG_TYPE_IFD8) ? *type : 
 
 Беззнаковое целочисленное переполнение при вычислении ширины:
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:freeimage-width-overflow]
 width = raw_width - left_margin - (get4() & 7);
@@ -413,10 +438,11 @@ width = raw_width - left_margin - (get4() & 7);
 В проекте rizin была найдена ошибка целочисленного переполнения, приводящая к
 выходу за границы массива:
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:rizin-overflow]
-symbols_size = (symbols_count + 1) * 2 * sizeof(struct symbol_t);
+symbols_size = (symbols_count + 1) * 2 *
+                   sizeof(struct symbol_t);
 
 if (symbols_size < 1) {
     ht_pp_free(hash);
@@ -432,13 +458,14 @@ if (!(symbols = calloc(1, symbols_size))) {
 \begin{frame}[fragile]{rizin}
 Выход за границы массива вследствие переполнения:
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:rizin-oob]
 for (i = 0; i < bin->nsymtab && i < symbols_count; i++) {
 ...
     symbols[j].last = 0;
-    if (inSymtab(hash, symbols[j].name, symbols[j].addr)) {
+    if (inSymtab(hash, symbols[j].name,
+                 symbols[j].addr)) {
         RZ_FREE(symbols[j].name);
     } else {
         j++;
@@ -454,7 +481,7 @@ symbols[j].last = true;
 Ошибки целочисленного переполнения при умножении и сложении:
 \tiny
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:xlnt-overflow]
 in_->seekg(
@@ -467,12 +494,12 @@ std::vector<byte> sector(sector_size(), 0);
 \begin{frame}[fragile]{xlnt}
 Найденная ошибка выхода за границы массива:
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:xlnt-oob]
 sector_chain
 compound_document::follow_chain(sector_id start,
-                                const sector_chain &table)
+                            const sector_chain &table)
 {
     auto chain = sector_chain();
     auto current = start;
@@ -490,7 +517,7 @@ compound_document::follow_chain(sector_id start,
 \begin{frame}[fragile]{unbound}
 Ошибка целочисленного переполнения в unbound:
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:unbound_overflow]
 int sign = 0;
@@ -510,7 +537,7 @@ for(*endptr = nptr; **endptr; (*endptr)++) {
 \begin{frame}[fragile]{hdp}
 Ошибка целочисленного деления на ноль в проекте hdp:
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:hdp-zerodiv]
 int32 buf_size;
@@ -525,7 +552,7 @@ chunk = buf_size / hsize + 1;
 \begin{frame}[fragile]{miniz}
 Ошибки целочисленного переполнения в miniz (зависимость PyTorch):
 \begin{lstlisting}[language=C, basicstyle=\small\ttfamily,
-                   xleftmargin=2em,
+                   xleftmargin=1em,
                    captionpos=b,
                    label=lst:miniz-overflow]
 if (cdir_size < pZip->m_total_files *
